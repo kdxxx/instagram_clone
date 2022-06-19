@@ -5,6 +5,9 @@ import 'package:instagram/screens/signup_screen.dart';
 import 'package:instagram/utils/utils.dart';
 import 'package:instagram/widgets/text_field_input.dart';
 
+import '../responsive/mobile_screen_layout.dart';
+import '../responsive/responsive_layout_screen.dart';
+import '../responsive/web_screen_layout.dart';
 import '../utils/colors.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -35,6 +38,12 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailController.text, password: _passwordController.text);
 
     if (res == "success") {
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+        builder: (context) => ResponsiveLayout(
+          mobileScreenLaoyout: MobileScreenLayout(),
+          webScreenLayout: WebScreenLayout(),
+        ),
+      ));
     } else {
       showSnackBar(res, context);
     }

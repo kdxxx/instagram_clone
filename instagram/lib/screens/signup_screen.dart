@@ -5,6 +5,9 @@ import 'package:instagram/resources/auth_methods.dart';
 import 'package:instagram/screens/login_screen.dart';
 import 'package:instagram/utils/utils.dart';
 import 'package:instagram/widgets/text_field_input.dart';
+import '../responsive/mobile_screen_layout.dart';
+import '../responsive/responsive_layout_screen.dart';
+import '../responsive/web_screen_layout.dart';
 import '../utils/colors.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -41,7 +44,7 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   void signUpUser() async {
-    setState((){
+    setState(() {
       _isloading = true;
     });
     String res = await AuthMethods().signUpUser(
@@ -50,16 +53,25 @@ class _SignupScreenState extends State<SignupScreen> {
         username: _usernameController.text,
         bio: _bioController.text,
         file: _image!);
-    if (res != 'success') {
-      showSnackBar(res, context);
-    }
-    setState((){
+
+    setState(() {
       _isloading = false;
     });
+    if (res != 'success') {
+      showSnackBar(res, context);
+    } else {
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => ResponsiveLayout(
+          mobileScreenLaoyout: MobileScreenLayout(),
+          webScreenLayout: WebScreenLayout(),
+        ),
+      ));
+    }
   }
 
-  void navigateToLogin(){
-    Navigator.of(context).push(MaterialPageRoute(builder: (context)=> LoginScreen()));
+  void navigateToLogin() {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => LoginScreen()));
   }
 
   @override
@@ -125,22 +137,26 @@ class _SignupScreenState extends State<SignupScreen> {
                 textInputType: TextInputType.text),
             const SizedBox(height: 24),
             InkWell(
-              child: _isloading ? const Center(child: CircularProgressIndicator(
-                color: primaryColor,
-              ),) :Container(
-                child: const Text(
-                  'Sign up',
-                ),
-                width: double.infinity,
-                alignment: Alignment.center,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: const ShapeDecoration(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(4)),
-                  ),
-                  color: blueColor,
-                ),
-              ),
+              child: _isloading
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: primaryColor,
+                      ),
+                    )
+                  : Container(
+                      child: const Text(
+                        'Sign up',
+                      ),
+                      width: double.infinity,
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: const ShapeDecoration(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(4)),
+                        ),
+                        color: blueColor,
+                      ),
+                    ),
               onTap: signUpUser,
             ),
             const SizedBox(
@@ -160,7 +176,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 GestureDetector(
                   onTap: navigateToLogin,
                   child: Container(
-                    child:  Text("Log in",
+                    child: Text("Log in",
                         style: TextStyle(fontWeight: FontWeight.bold)),
                     padding: const EdgeInsets.symmetric(vertical: 8),
                   ),
