@@ -15,6 +15,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (kIsWeb) {
     await Firebase.initializeApp(
+      // for website emulator
       options: const FirebaseOptions(
         apiKey: 'AIzaSyAw7V_xMdI6OCEPrGkm2Evt4jXoTk26008',
         appId: '1:337529384371:web:c73e763d4314698ee46fc6',

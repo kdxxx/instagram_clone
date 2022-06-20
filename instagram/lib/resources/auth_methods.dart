@@ -50,14 +50,6 @@ class AuthMethods {
         res = "success";
       }
     }
-    /*on FirebaseAuthException catch(err){
-      if(err.code == 'invalid-email'){
-        res = 'The email is invalid.';
-      }
-      else if(err.code == 'weak-password'){
-        res = 'password is weak';
-      }
-    }*/
     catch (err) {
       res = err.toString();
     }
