@@ -1,25 +1,67 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram/providers/user_provider.dart';
+import 'package:instagram/resources/firestore_methods.dart';
 import 'package:instagram/utils/colors.dart';
-
+import 'package:provider/provider.dart';
+import '../models/user.dart';
 import '../widgets/comment_card.dart';
 
+/// the part for the likes of comments is not added.
+
 class CommentsScreen extends StatefulWidget {
-  const CommentsScreen({Key? key}) : super(key: key);
+  final snap;
+  const CommentsScreen({Key? key, required this.snap}) : super(key: key);
 
   @override
   State<CommentsScreen> createState() => _CommentsScreenState();
 }
 
 class _CommentsScreenState extends State<CommentsScreen> {
+  final TextEditingController _commentController = TextEditingController();
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _commentController.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final User user = Provider.of<UserProvider>(context).getUser;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: mobileBackgroundColor,
         title: const Text('Comments'),
         centerTitle: false,
       ),
-      body: CommentCard(),
+      body: StreamBuilder(
+        stream: FirebaseFirestore.instance
+            .collection('posts')
+            .doc(widget.snap['postId'])
+            .collection('comments')
+            .orderBy(
+              'datePublished',
+              descending: true,
+            )
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          return ListView.builder(
+            itemCount: (snapshot.data! as dynamic).docs.length,
+            itemBuilder: (context, index) => CommentCard(
+              snap: (snapshot.data! as dynamic).docs[index].data(),
+            ),
+          );
+        },
+      ),
       bottomNavigationBar: SafeArea(
         child: Container(
           height: kToolbarHeight,
@@ -29,24 +71,34 @@ class _CommentsScreenState extends State<CommentsScreen> {
           child: Row(
             children: [
               CircleAvatar(
-                backgroundImage: NetworkImage(
-                  'https://images.unsplash.com/photo-1655699093883-cfb76f78fa50?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHw%3D&auto=format&fit=crop&w=1000&q=60',
-                ),
+                backgroundImage: NetworkImage(user.photoUrl),
                 radius: 10,
               ),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 16, right: 8),
                   child: TextField(
+                    controller: _commentController,
                     decoration: InputDecoration(
-                      hintText: 'Comment as username',
+                      hintText: 'Comment as ${user.username}',
                       border: InputBorder.none,
                     ),
                   ),
                 ),
               ),
               InkWell(
-                onTap: () {},
+                onTap: () async {
+                  await FireStoreMethods().postComment(
+                    widget.snap['postId'],
+                    _commentController.text,
+                    user.uid,
+                    user.username,
+                    user.photoUrl,
+                  );
+                  setState(() {
+                    _commentController.text = "";
+                  });
+                },
                 child: Container(
                   padding:
                       const EdgeInsets.symmetric(vertical: 8, horizontal: 8),

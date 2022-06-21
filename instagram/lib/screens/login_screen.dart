@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:instagram/resources/auth_methods.dart';
 import 'package:instagram/screens/signup_screen.dart';
+import 'package:instagram/utils/global_variables.dart';
 import 'package:instagram/utils/utils.dart';
 import 'package:instagram/widgets/text_field_input.dart';
 
@@ -52,8 +53,9 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  void navigateToSignup(){
-    Navigator.of(context).push(MaterialPageRoute(builder: (context)=> SignupScreen()));
+  void navigateToSignup() {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => SignupScreen()));
   }
 
   @override
@@ -61,12 +63,15 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
         body: SafeArea(
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 32),
+        padding: MediaQuery.of(context).size.width > webScreenSize
+            ? EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width / 3)
+            : const EdgeInsets.symmetric(horizontal: 32),
         width: double.infinity,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Flexible(child: Container(), flex: 2),
+            Flexible(flex: 2, child: Container()),
             SvgPicture.asset(
               'assets/ic_instagram.svg',
               color: primaryColor,
