@@ -6,7 +6,6 @@ import 'package:instagram/resources/firestore_methods.dart';
 import 'package:provider/provider.dart';
 import 'package:instagram/utils/colors.dart';
 import 'package:instagram/utils/utils.dart';
-import '../models/user.dart';
 
 class AddPostScreen extends StatefulWidget {
   const AddPostScreen({Key? key}) : super(key: key);
@@ -20,38 +19,13 @@ class _AddPostScreenState extends State<AddPostScreen> {
   final TextEditingController _descriptionController = TextEditingController();
   bool _isLoading = false;
 
-  void postImage(String uid, String username, String profImage) async {
-    setState(() {
-      _isLoading = true;
-    });
-    try {
-      String res = await FireStoreMethods().uploadPost(
-          _descriptionController.text, _file!, uid, username, profImage);
-
-      if (res == "success") {
-        setState(() {
-          _isLoading = false;
-        });
-        showSnackBar('Posted', context);
-        clearImage();
-      } else {
-        setState(() {
-          _isLoading = false;
-        });
-        showSnackBar(res, context);
-      }
-    } catch (e) {
-      showSnackBar(e.toString(), context);
-    }
-  }
-
-  _selectImage(BuildContext context) async {
+  _selectImage(BuildContext parentcontext) async {
     return showDialog(
-        context: context,
-        builder: (context) {
+        context: parentcontext,
+        builder: (BuildContext context) {
           return SimpleDialog(
             title: const Text('Create a Post'),
-            children: [
+            children: <Widget>[
               SimpleDialogOption(
                 padding: const EdgeInsets.all(20),
                 child: const Text('Take a photo'),
@@ -90,12 +64,36 @@ class _AddPostScreenState extends State<AddPostScreen> {
         });
   }
 
-  void clearImage(){
-    setState((){
+  void postImage(String uid, String username, String profImage) async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      String res = await FireStoreMethods().uploadPost(
+          _descriptionController.text, _file!, uid, username, profImage);
+
+      if (res == "success") {
+        setState(() {
+          _isLoading = false;
+        });
+        showSnackBar(context, 'Posted');
+        clearImage();
+      } else {
+        showSnackBar(context, res);
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      showSnackBar(context, e.toString());
+    }
+  }
+
+  void clearImage() {
+    setState(() {
       _file = null;
     });
   }
-
 
   @override
   void dispose() {
@@ -106,12 +104,13 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final User user = Provider.of<UserProvider>(context).getUser;
+    final UserProvider userProvider = Provider.of<UserProvider>(context);
+    //final User user = Provider.of<UserProvider>(context).getUser;
 
     return _file == null
         ? Center(
             child: IconButton(
-              icon: Icon(Icons.upload),
+              icon: const Icon(Icons.upload),
               onPressed: () => _selectImage(context),
             ),
           )
@@ -119,12 +118,12 @@ class _AddPostScreenState extends State<AddPostScreen> {
             appBar: AppBar(
               backgroundColor: mobileBackgroundColor,
               leading: IconButton(
-                icon: Icon(Icons.arrow_back),
-                onPressed:clearImage,
+                icon: const Icon(Icons.arrow_back),
+                onPressed: clearImage,
               ),
-              title: Text('Post To'),
+              title: const Text('Post To'),
               centerTitle: false,
-              actions: [
+              actions: <Widget>[
                 TextButton(
                   child: const Text(
                     'Post',
@@ -134,8 +133,10 @@ class _AddPostScreenState extends State<AddPostScreen> {
                       fontSize: 16,
                     ),
                   ),
-                  onPressed: () =>
-                      postImage(user.uid, user.username, user.photoUrl),
+                  onPressed: () => postImage(
+                      userProvider.getUser.uid,
+                      userProvider.getUser.username,
+                      userProvider.getUser.photoUrl),
                 ),
               ],
             ),
@@ -150,10 +151,10 @@ class _AddPostScreenState extends State<AddPostScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: <Widget>[
                     CircleAvatar(
                       backgroundImage: NetworkImage(
-                        user.photoUrl,
+                        userProvider.getUser.photoUrl,
                       ),
                     ),
                     SizedBox(

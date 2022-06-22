@@ -60,7 +60,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       setState(() {});
     } catch (e) {
-      showSnackBar(e.toString(), context);
+      showSnackBar(context,e.toString());
     }
     setState(() {
       // it is loaded now

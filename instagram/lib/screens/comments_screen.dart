@@ -47,7 +47,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
               descending: true,
             )
             .snapshots(),
-        builder: (context, snapshot) {
+        builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(),
@@ -55,7 +55,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
           }
 
           return ListView.builder(
-            itemCount: (snapshot.data! as dynamic).docs.length,
+            itemCount: snapshot.data!.docs.length,
             itemBuilder: (context, index) => CommentCard(
               snap: (snapshot.data! as dynamic).docs[index].data(),
             ),

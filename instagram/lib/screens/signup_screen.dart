@@ -58,7 +58,7 @@ class _SignupScreenState extends State<SignupScreen> {
       _isloading = false;
     });
     if (res != 'success') {
-      showSnackBar(res, context);
+      showSnackBar(context,res);
     } else {
       Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => ResponsiveLayout(
